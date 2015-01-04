@@ -1,0 +1,168 @@
+
+\documentclass{article}
+\usepackage{amsmath,amsthm}
+\usepackage{cancel}
+\begin{document}
+
+ % From Wikipedia, not sure where to define this yet...
+\def\ci{\perp\!\!\!\perp}
+
+\section{Probabilities are sensitive to the form of the question that
+  was used to generate the answer}
+
+\subsection{}
+
+Possible outcomes for $X$, the genders of the two children, are
+
+\[
+X\in \left\{ (B,B), (B,G), (G,B), (\cancel{G,G})\right\}
+\]
+
+We have eliminated the possiblity of two girls. There are two
+remaining outcomes that include at least one girl, so the probability is $\frac{2}{3}$.
+
+\subsection{}
+
+$X \in \{ B, G \}$, so the probability is simply $\frac{1}{2}$.
+
+\section{Legal reasoning}
+
+\subsection{}
+
+\begin{list}{}{}
+\item Let $G$ = defendant is guilty
+\item Let $B$ = defendant's blood type matches blood type at the scene
+\end{list}
+
+The probability that the defendant is guilty given that the
+defendant's blood type was found at the scene is then
+
+\[ P(G|B) = \frac{P(G \cap B)}{P(B)} \]
+
+The prosecutor is confusing $P(B)$ for $P(G|B)$. The prosecutor is failing
+to account for $P(G)$, the prior probability that the defendant
+committed the crime, which is extremely low.
+
+\subsection{}
+
+The defense attorney is ignoring all of the other evidence against the
+defendant. Not all of the 8000 people with the matching blood type are
+equally likely to have committed the crime.
+
+\section{Variance of a sum}
+Prove: $var[X + Y] = var[X] + var[Y] + 2cov[X,Y]$
+
+\begin{align}
+  var[X] &= E[X^2]-\mu^2 \\
+  cov[X,Y] &= E[XY] - E[X]E[Y]
+\end{align}
+\begin{align*}
+  var[X+Y] &= E[(X+Y)(X+Y)] - E^2[X+Y] \\
+           &= E[X^2+2XY+Y^2] - E^2[X+Y] \\
+           &= E[X^2+2XY+Y^2] - (\mu_x + \mu_y)^2 \\
+           &= E[X^2+2XY+Y^2] - (\mu_x^2 + 2\mu_x\mu_y + \mu_y^2) \\
+           &= E[X^2+2XY+Y^2] - \mu_x^2 - 2\mu_x\mu_y - \mu_y^2 \\
+           &= E[X^2] - \mu_x^2 + E[Y^2] - \mu_y^2 + 2(E[XY]-\mu_x\mu_y)
+             \text{\qquad(By linearity of expectations)}\\
+           &= var[X] + var[Y] + 2cov[X,Y] \\
+           &= var[X + Y] \qed
+\end{align*}
+
+\section{Bayes rule for medical diagnosis}
+
+\begin{list}{}{}
+\item Let D = You have the disease
+\item Let T = You test positive
+\end{list}
+
+\begin{align*}
+  P(D) &= \frac{1}{10000} & P(\bar{D}) &= \frac{9999}{10000} \\
+  P(T|D) &= \frac{99}{100} & P(T|\bar{D}) &= \frac{1}{100} \\
+  P(D|T) &= \frac{P(D \cap T)}{P(T)} = \frac{P(T \cap D)}{P(T)} \\
+  P(D|T) &= \frac{P(T|D)P(D)}{P(T)} \\
+  P(D|T) &= \frac{P(T|D)P(D)}{P(T|D)P(D) + P(T|\bar{D})P(\bar{D})} \\
+  P(D|T) &= \frac{(.99)(.0001)}{(.99)(.0001) + (.01)(.9999)} \\
+  P(D|T) &= .98\%
+\end{align*}
+
+\section{The Monty Hall problem}
+
+\begin{list}{}{}
+\item Let $A$ = the prize is behind door 1
+\item Let $B$ = the prize is behind door 2
+\item Let $C$ = the prize is behind door 3
+\item Let $c$ = the host opens door 3
+\end{list}
+
+\begin{align*}
+  P(A) = P(B) = P(C) &= \frac{1}{3} \\
+  P(c|A) &= \frac{1}{2} \\
+  P(c|B) &= 1 \\
+  P(c|C) &= 0
+\end{align*}
+
+\begin{align*}
+  P(B|c) &= \frac{P(c|B)P(B)}{P(c)} \\
+  &= \frac{P(c|B)P(B)}{P(c|A)P(A) + P(c|B)P(B) + P(c|C)p(C)} \\
+  &= \frac{\frac{1}{3}}{\frac{1}{6} + \frac{2}{6} + 0} \\
+  &= \frac{2}{3}
+\end{align*}
+
+There is a $\frac{2}{3}$ chance that the prize is behind door 2, so
+the contestant should definitely switch.
+
+\section{Conditional independence}
+\subsection{}
+
+\begin{align*}
+  P(H=k|e_1,e_2) &= \frac{P(H=k \cap e_1,e_2)}{P(e_1,e_2)} \\
+  &= \frac{P(e_1 \cap e_2|H=k)P(H=k)}{P(e_1,e_2)} \qquad \text{(ii.)}
+\end{align*}
+
+(ii.) is sufficient.
+
+\subsection{}
+
+\begin{equation*}
+  E_1 \ci E_2 | H \implies P(e_1,e_2|H) = P(e_1|H) \cdot P(e_2|H)
+\end{equation*}
+\begin{align*}
+    P(H=k|e_1,e_2) &= \frac{P(e_1 \cap e_2|H=k)P(H=k)}{P(e_1,e_2)} \\
+    &= \frac{P(e_1|H=k)P(e_2|H=k)P(H=k)}{P(e_1,e_2)} \qquad
+    \text{(i.)} \\
+    &= \frac{P(e_1|H=k)P(e_2|H=k)P(H=k)}{\sum\limits_{j=1}^K
+      P(e_1,e_2|H=j)P(H=j)} \\
+    &= \frac{P(e_1|H=k)P(e_2|H=k)P(H=k)}{\sum\limits_{j=1}^K
+      P(e_1|H=j)P(e_2|H=j)P(H=j)} \qquad \text{(iii.)}
+\end{align*}
+
+(i.), (ii.), and (iii.) are each sufficient.
+
+\section{Pairwise independence does not imply mutual independence}
+
+Example: Let X and Y represent two coin tosses, with value 0 or 1 for
+heads or tails, respectively. Let Z = 1 if two coin tosses result in
+only one heads.
+
+\[ (X, Y, Z) = \left\{
+  \begin{array}{ccc}
+    ( 0, & 0, & 0 ) \\
+    (0, & 1, & 1) \\
+    (1, & 0, & 1) \\ 
+    (1, & 1, & 0)
+  \end{array}
+\right\}
+\]
+
+\begin{gather*}
+  P(X=1) = P(Y=1) = P(Z=1) = \frac{1}{2} \\
+  P(X=1|Y=1) = P(X=1|Z=1) = P(Y=1|Z=1) = \frac{1}{2} \\
+  P(X=1,Y=1,Z=1) \stackrel{?}{=} P(X=1)P(Y=1)P(Z=1) \\
+  0 \neq \frac{1}{2} \cdot \frac{1}{2} \cdot \frac{1}{2}
+\end{gather*}
+
+The state of any two variables $\in (X, Y, Z)$ determines the third.
+This means that $X$, $Y$, and $Z$ are pairwise independent, but
+\textbf{not} mutually independent.
+
+\end{document}
