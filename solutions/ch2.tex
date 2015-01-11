@@ -172,21 +172,21 @@ This means that $X$, $Y$, and $Z$ are pairwise independent, but
 
 By definition, $X \ci Y | Z$ iff
 
-\begin{equation} \label{eq:8.1}
+\begin{equation} \label{eq:8-1}
   p(x,y|z) = p(x|z)p(y|z)
 \end{equation}
 
 We wish to prove an alternate definition - $X \ci Y | Z$ iff there
 exist functions $g$ and $h$ such that
 
-\begin{equation} \label{eq:8.2}
+\begin{equation} \label{eq:8-2}
   p(x,y|z) = g(x,z)h(y,z)
 \end{equation}
 
 for all $x, y$ and $z$ such that $p(z) > 0$.
 
-To prove this we will show that given equation \ref{eq:8.2}, equation
-\ref{eq:8.1} follows, and $X \ci Y | Z$.
+To prove this we will show that given equation \ref{eq:8-2}, equation
+\ref{eq:8-1} follows, and $X \ci Y | Z$.
 
 We begin by integrating out $x$.
 
@@ -221,16 +221,16 @@ Plugging into our original equation, we have
 
 By decomposition of $(X \ci Y,W | Z)$, we have
 
-\begin{equation} \label{eq:9.1}
+\begin{equation} \label{eq:9-1}
   X \ci Y | Z
 \end{equation}
 
-\begin{equation} \label{eq:9.2}
+\begin{equation} \label{eq:9-2}
   X \ci W | Z
 \end{equation}
 
-(\ref{eq:9.1}) is trivally true by (B). Now we must examine
-(\ref{eq:9.2}).
+(\ref{eq:9-1}) is trivally true by (B). Now we must examine
+(\ref{eq:9-2}).
 
 \[
 \overbrace{(X \ci W | Z,Y)}^{A} \wedge \overbrace{(X \ci Y | Z)}^{B}
@@ -244,7 +244,7 @@ By decomposition of $(X \ci Y,W | Z)$, we have
   P(X|Z) &= P(X|WZ) \implies X \ci W | Z
 \end{align*}
 
-Both (\ref{eq:9.1}) and (\ref{eq:9.2}) are true, so it is true that
+Both (\ref{eq:9-1}) and (\ref{eq:9-2}) are true, so it is true that
 \[
 (X \ci W | Z,Y) \wedge (X \ci Y | Z) \implies (X \ci Y,W | Z)
 \]
