@@ -2,6 +2,7 @@
 \documentclass{article}
 \usepackage{amsmath,amsthm}
 \usepackage{cancel}
+\usepackage{indentfirst}
 \begin{document}
 
  % From Wikipedia, not sure where to define this yet...
@@ -142,7 +143,7 @@ the contestant should definitely switch.
 
 Example: Let X and Y represent two coin tosses, with value 0 or 1 for
 heads or tails, respectively. Let Z = 1 if two coin tosses result in
-only one heads.
+exactly one heads.
 
 \[ (X, Y, Z) = \left\{
   \begin{array}{ccc}
@@ -164,5 +165,175 @@ only one heads.
 The state of any two variables $\in (X, Y, Z)$ determines the third.
 This means that $X$, $Y$, and $Z$ are pairwise independent, but
 \textbf{not} mutually independent.
+
+\section{Conditional independence iff joint factorizes}
+
+\setcounter{equation}{0}
+
+By definition, $X \ci Y | Z$ iff
+
+\begin{equation} \label{eq:8.1}
+  p(x,y|z) = p(x|z)p(y|z)
+\end{equation}
+
+We wish to prove an alternate definition - $X \ci Y | Z$ iff there
+exist functions $g$ and $h$ such that
+
+\begin{equation} \label{eq:8.2}
+  p(x,y|z) = g(x,z)h(y,z)
+\end{equation}
+
+for all $x, y$ and $z$ such that $p(z) > 0$.
+
+To prove this we will show that given equation \ref{eq:8.2}, equation
+\ref{eq:8.1} follows, and $X \ci Y | Z$.
+
+We begin by integrating out $x$.
+
+\begin{align*}
+  \int_x p(x,y|z) dx &= \int_x g(x,z)h(y,z)dx \\
+  p(y|z) &= h(y,z)g(z) \\
+  p(y|z) \frac{1}{g(z)} &= h(y,z)
+\end{align*}
+
+By a symmetric argument, we have $p(x|z) \frac{1}{h(z)} = g(x,z)$.
+Plugging into our original equation, we have
+
+\begin{align*}
+  p(x,y|z) &= p(y|z)p(x|z)\frac{1}{g(z)}\frac{1}{h(z)} \\
+  \int_x \int_y p(x,y|z) dx dy &= \int_x \int_y
+                                 p(y|z)p(x|z)\frac{1}{g(z)}\frac{1}{h(z)}
+  dx\,dy \\
+  1 &= \frac{1}{g(z)}\frac{1}{h(z)} \\
+  p(x,y|z) &= p(y|z)p(x|z) \cdot 1 \qed
+\end{align*}
+
+\section{Conditional independence}
+
+\subsection{}
+
+\setcounter{equation}{0}
+
+\[
+\overbrace{(X \ci W | Z,Y)}^{A} \wedge \overbrace{(X \ci Y | Z)}^{B}
+\stackrel{?}{\implies} (X \ci Y,W | Z)
+\]
+
+By decomposition of $(X \ci Y,W | Z)$, we have
+
+\begin{equation} \label{eq:9.1}
+  X \ci Y | Z
+\end{equation}
+
+\begin{equation} \label{eq:9.2}
+  X \ci W | Z
+\end{equation}
+
+(\ref{eq:9.1}) is trivally true by (B). Now we must examine
+(\ref{eq:9.2}).
+
+\[
+\overbrace{(X \ci W | Z,Y)}^{A} \wedge \overbrace{(X \ci Y | Z)}^{B}
+\stackrel{?}{\implies} (X \ci W | Z)
+\]
+
+\begin{align*}
+  P(X|WYZ) &= P(X|YZ) \quad &\text{by (B)} \\
+  &= P(X|Z) \quad &\text{by (A)} \\
+  P(X|WYZ) &= P(X|WZ) \quad &\text{by (A)} \\
+  P(X|Z) &= P(X|WZ) \implies X \ci W | Z
+\end{align*}
+
+Both (\ref{eq:9.1}) and (\ref{eq:9.2}) are true, so it is true that
+\[
+(X \ci W | Z,Y) \wedge (X \ci Y | Z) \implies (X \ci Y,W | Z)
+\]
+
+\subsection{}
+
+\[
+(X \ci Y | Z) \wedge (X \ci Y | W) \stackrel{?}{\implies} (X \ci Y | Z,W)
+\]
+
+We disprove this with a counter example. Let $X$, $Y$, and $Z$ be
+i.i.d., where
+
+\[
+P(X) =
+\begin{cases}
+.5, \quad &\text{ X = 1} \\
+.5, \quad &\text{X = -1}
+\end{cases}
+\]
+
+Let $W = XYZ$.
+
+\par
+Given $Z$, knowledge of $Y$ gives no additional information about $X$.
+\par
+Given $W$, knowledge of $Y$ gives no additional information about $X$.
+\par
+Given $W,Z$ however, $X$ and $Y$ are \textbf{not} independent, because
+$XY = WZ$.
+
+\section{Deriving the inverse gamma density}
+
+\begin{align*}
+  X &\sim \text{Ga}(a,b) \\
+  p(x) &= \text{Ga}(x|a,b) = \frac{b^a}{\Gamma(a)} x^{a-1}e^{-xb} \\
+  P_{x}(x) &= \int{f(x) \; dx} \\
+  P_{x}(x) &= \int{\frac{b^{a}}{\Gamma(a)} x^{a-1} e^{-xb} \; dx}
+\end{align*}
+
+Now we change variables to find the cdf of $Y$, $P_{y}(y)$
+\begin{align*}
+  x &= \frac{1}{y} = y^{-1} \\
+  \frac{dx}{dy} &= -y^{-2} = -\frac{1}{y^{2}} \\
+  dx &= -\frac{1}{y^{2}} \\
+  P_{y}(y) &= \int{ \frac{b^{a}}{\Gamma(a)}
+             \left( y^{-1} \right) ^{a-1} e^{-\frac{b}{y}}
+             y^{-2} \; dy} \\
+    &= \int{ \frac{b^{a}}{\Gamma(a)}
+      y^{-(a+1)} e^{-\frac{b}{y}}} \; dy \\
+  p(y) &= \frac{b^{a}}{\Gamma(a)}
+      y^{-(a+1)} e^{-\frac{b}{y}} \\
+  &= IG(y|a,b)
+\end{align*}
+
+\section{Normalization constant for a 1D Gaussian}
+
+After squaring Z and converting to polar coordinates, we have
+\begin{align*}
+  Z^{2} &= \int_0^{2\pi} \int_0^\infty re^{\frac{-r^{2}}{2\sigma^{2}}}
+          \; dr d\theta \\
+  &= \Big[ \theta \int_0^\infty{re^{-\frac{r^{2}}{2\sigma^{2}}} \; dr}
+    \Big]_0^{2\pi} \\
+  &= 2\pi \int_0^\infty{re^{-\frac{r^{2}}{2\sigma^{2}}}} \; dr
+\end{align*}
+
+Let $u = \phi(r) = e^{-\frac{r^{2}}{2\sigma^{2}}}$.
+
+\begin{align*}
+  \frac{du}{dr} &= -\frac{r}{\sigma^{2}}
+                  e^{-\frac{r^{2}}{2\sigma^{2}}} \\
+  du &= -\frac{r}{\sigma^{2}}
+                  e^{-\frac{r^{2}}{2\sigma^{2}}} dr \\
+  \frac{-\sigma^{2}}{u} du &= r \; dr \\
+  \phi(0) &= 1 \\
+  \phi(\infty) &= e^{-\infty} = 0
+\end{align*}
+
+Now we plug $u$ and $r \; dr$ back into our equation for $Z^2$.
+\begin{align*}
+  Z^2 &= 2\pi \int_1^0{u -\frac{\sigma^{2}}{u}} \; du \\
+  &= -2\pi \int_1^0{\sigma^{2}} \; du \\
+  &= -2\pi \sigma^{2} \cdot \Big[ u \Big]_1^0 \\
+  &= 2\pi \sigma^{2} \\
+  Z &= \pm \sqrt{2\pi\sigma} \\
+  &= \sqrt{2\pi\sigma}
+\end{align*}
+
+We take only the positive value, since we arbitrarily squared Z at the
+beginning of our derivation.
 
 \end{document}
