@@ -3,10 +3,15 @@
 \usepackage{amsmath,amsthm}
 \usepackage{cancel}
 \usepackage{indentfirst}
+\usepackage{commath}
 \begin{document}
 
  % From Wikipedia, not sure where to define this yet...
 \def\ci{\perp\!\!\!\perp}
+\def\defeq{\buildrel\triangle\over =}
+\def\E{\mathrm{E}}
+\def\Var{\mathrm{Var}}
+\def\Cov{\mathrm{Cov}}
 
 \section{Probabilities are sensitive to the form of the question that
   was used to generate the answer}
@@ -335,5 +340,246 @@ Now we plug $u$ and $r \; dr$ back into our equation for $Z^2$.
 
 We take only the positive value, since we arbitrarily squared Z at the
 beginning of our derivation.
+
+\section{Expressing mutual information in terms of entropies}
+
+\begin{align*}
+  I \left( X, Y \right) &= KL \left( p \left( X,Y \right) || p \left( X \right) p
+  \left( Y \right) \right) \\
+  &= \sum_x \sum_y p(x,y) \log \frac{p(x,y)}{p(x)p(y)} \\
+  H(X) &= - \sum_{k=1}^K p(X=k) \log p(X=k) \\
+  &= - \sum_x p(x) \log p(x) \\
+  H(X|Y) &= \sum_y p(y) H(X|Y=y) \\
+  &= \sum_y p(y) \left( - \sum_x p(x) \log p(x) | Y=y \right) \\
+  &= - \sum_y \sum_x p(x,y) \log \frac{p(x,y)}{p(y)} \\
+  H(X) - H(X|Y) &= - \sum_x p(x) \log p(x) + \sum_y \sum_x p(x,y) \log
+                  \frac{p(x,y)}{p(y)} \\
+  &= - \sum_y{p(y)} \sum_xp(x) \log p(x) + \sum_y \sum_x p(x,y) \log
+    \frac{p(x,y)}{p(y)} \\
+  &= - \sum_y \sum_x p(x,y) \log p(x) + \sum_y \sum_x p(x,y) \log
+    \frac{p(x,y)}{p(y)} \\
+  &= \sum_x \sum_y p(x,y) \log \frac{p(x,y)}{p(x)p(y)} \\
+  &= I(X,Y) \qed
+\end{align*}
+
+\section{Mutual information for correlated normals}
+
+\begin{align*}
+  I(X,Y) &= h(X) - h(X|Y) \\
+  &= h(X) - \left( h(X,Y) - h(Y) \right) \\
+  &= h(X) + h(Y) - h(X,Y) \\
+\end{align*}
+
+For a 1-d Gaussian,
+\[
+h(X) = \frac{1}{2} log_2 \left[ 2 \pi e \sigma^2 \right]
+\]
+
+For a 2-d Gaussian,
+\[
+h(X) = \frac{1}{2} log_2 \left[ \left( 2 \pi e \right)^2 \sigma^4
+  \left( 1 - \rho^2 \right) \right]
+\]
+
+$X_1$ and $X_2$ are individually normal with variance $\sigma^2$, so
+$h(X_1) = h(X_2)$.
+
+\begin{align*}
+  I(X_1, X_2) &= h(X_1) + h(X_2) - h(X_1, X_2) \\
+  &= \log_2 (2 \pi e)^2 \sigma^4 - \frac{1}{2} \log_2 (2 \pi e)^2
+    \sigma^4 (1 - \rho^2) \\
+  &= - \frac{1}{2} \log_2 (1 - \rho^2)
+\end{align*}
+
+\begin{enumerate}
+  \item $\rho = 1; \; I(X_1, X_2) = \infty$ \qquad (perfect correlation,
+    $X_1 = X_2$) \\
+  \item $\rho = 0; \; I(X_1, X_2) = 0$ \qquad (independent) \\
+  \item $\rho = -1; \; I(X_1, X_2) = 0$ \qquad (perfect correlation,
+    $X_1 = -X_2$) \\
+\end{enumerate}
+
+\section{A measure of correlation (normalized mutual information)}
+
+\begin{equation*}
+  r = 1 - \frac{H(Y|X)}{H(X)}
+\end{equation*}
+
+\subsection{}
+\begin{align*}
+  I(X,Y) &= H(X) - H(Y|X) \\
+  r &= \frac{H(X)}{H(X)} - \frac{H(Y|X)}{H(X)} \\
+  &=  \frac{H(X)}{H(X)} - \frac{H(X|Y)}{H(X)} \qquad \text{(because }
+    H(X) = H(Y)\text{)} \\
+  &= \frac{I(X,Y)}{H(X)}
+\end{align*}
+
+\subsection{}
+$
+\begin{array}{rcl}
+  0 \leq 
+  & H(X|Y)
+  & \leq H(X) \\
+  0 \leq
+  & \frac{H(X|Y)}{H(X)}
+  & \leq 1 \\
+  0 \leq 
+  & \frac{H(Y|X)}{H(X)}
+  & \leq 1 \\
+  0 \leq
+  & 1 - \frac{H(Y|X)}{H(X)}
+  & \leq 1 \\
+  0 \leq
+  & r
+  & \leq 1
+\end{array}
+$
+
+\subsection{}
+$r = \frac{I(X,Y)}{H(X)}$, so $r = 0$ when $I(X,Y) = 0$. This occurs
+when $X$ and $Y$ are independent.
+
+\subsection{}
+$r = \frac{H(X|Y)}{H(X)}$, so $r = 1$ when $H(X|Y)$ = 0. This occurs
+when $X$ and $Y$ are perfectly correlated.
+
+\section{MLE minimizes KL divergence to the empirical distribution}
+
+\[
+0 \le KL(p || q) = \int_x p(x) \log \left( \frac{p(x)}{q(x)} \right)
+dx
+\]
+
+$KL(p||q)$ is non-negative, so it is minimized at 0, or when
+
+\begin{gather*}
+  p(x) \log p(x) - p(x) \log q(x) = 0 \\
+  p(x) \log p(x) = p(x) \log q(x) \\
+  \log p(x) = \log q(x) \\
+\end{gather*}
+
+$p(x)$ is the empirical distribution, so we have
+
+\begin{equation*}
+  p_{emp}(x) =  q(x; \theta)
+\end{equation*}
+
+Therefore, $\theta$ must be the MLE.
+
+\begin{equation*}
+  p_{emp}(x) = q(x; \boldsymbol{\hat{\theta}})
+\end{equation*}
+
+\section{Mean, mode, variance for the beta distribution}
+\setcounter{equation}{0}
+\begin{equation}
+  \label{eq:16-1}
+  \text{Beta}(x|a,b) = \frac{1}{B(a,b)}x^{a-1}(1-x)^{b-1}  
+\end{equation}
+
+\begin{equation}
+  \label{eq:16-2}
+  B(a,b) \defeq \frac{\Gamma(a) \Gamma(b)}{\Gamma(a+b)}
+\end{equation}
+
+\begin{align*}
+  \E[X] &= \int_0^1 x \cdot \frac{1}{B(a,b)} x^{a-1} (1-x)^{b-1} \; dx
+  \\
+       &= \frac{1}{B(a,b)} \int_0^1 x^a (1-x)^{b-1} \; dx \\
+       &= \frac{1}{B(a,b)} \cdot B(a+1,b) \\
+       &= \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \cdot
+         \frac{\Gamma(a+1)\Gamma(b)}{\Gamma(a+b+1)} \\
+       &= \frac{\Gamma(a+1)\Gamma(a+b)}{\Gamma(a)\Gamma(a+b+1)} \\
+       &= \frac{a\Gamma(a) \Gamma(a+b)}{\Gamma(a) (a+b) \Gamma(a+b)} \\
+       &= \frac{a}{a+b} \qquad \text{(mean)}
+\end{align*}
+
+\begin{align*}
+  \E[X^2] &= \int_0^1 \frac{1}{B(a,b)} x^{a-1} (1-x)^{b-1} x^2 \; dx \\
+         &= \frac{1}{B(a,b)} \int_0^1 x^{a+1} (1-x)^{b-1} \; dx \\
+         &= \frac{1}{B(a,b)} B(a+2,b) \\
+         &= \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} \cdot
+           \frac{\Gamma(a+2)\Gamma(b)}{\Gamma(a+b+2)} \\
+         &=
+           \frac{\Gamma(a+b)(a+1)\Gamma(a+1)}{\Gamma(a)(a+b+1)\Gamma(a+b+1)}
+  \\
+         &=
+           \frac{\Gamma(a+b)(a+1)a\Gamma(a)}{\Gamma(a)(a+b+1)(a+b)\Gamma(a+b)}
+  \\
+  &= \frac{a(a+1)}{(a+b)(a+b+1)} \\
+\end{align*}
+
+\begin{align*}
+  \Var[X] &= \E[X^2] - (\E[X])^2 \\
+          &= \frac{(a+1)(a)}{(a+b)(a+b+1)} - \left(\frac{a}{a+b}\right)^2 \\
+          &= \frac{(a+1)(a)}{(a+b)(a+b+1)} - \frac{a^2}{(a+b)^2} \\
+          &= \frac{(a+b)(a+1)a}{(a+b)^2(a+b+1)} -
+            \frac{a^2(a+b+1)}{(a+b)^2(a+b+1)} \\
+          &= \frac{a(a+b)(a+1) - a^2(a+b+1)}{(a+b)^2(a+b+1)} \\
+          &= \frac{a(a^2 + a + ab + b) - a^3 - ba^2 -
+            a^2}{(a+b)^2(a+b+1)} \\
+          &= \frac{ab}{(a+b)^2(a+b+1)} \qquad \text{(variance)}
+\end{align*}
+
+The mode of the distribution occurs where the pdf is at a maximum. To
+maximize the pdf, we must find where $p'(x) = 0$.
+
+\begin{align*}
+  p(x) &= \frac{x^{a-1}(1-x)^{b-1}}{B(a,b)} \\
+  \od{}{x} p(x) &= \frac{(a-1)x^{a-2}(1-x)^{b-1}}{B(a,b)} -
+                 \frac{x^{a-1}(b-1)(1-x)^{b-2}}{B(a,b)} = 0 \\
+\end{align*}
+
+We can ignore the denominator.
+
+\begin{gather*}
+  (a-1)x^{a-2}(1-x)^{b-1} - x^{a-1}(b-1)(1-x)^{b-2} = 0 \\
+  x^{a-2} \cdot \left[ (a-1)(1-x)^{b-1} - x(b-1)(1-x)^{b-2} \right] =
+  0 \\
+  x^{a-2}(1-x)^{b-2} \left[ (a-1)(1-x) - x(b-1) \right] = 0 \\
+  a - ax - 1 + x - bx + x = 0 \\
+  -x(a + b - 2) + a - 1 = 0 \\
+  x = \frac{a-1}{a+b-2} \quad \text{(mode)}
+\end{gather*}
+
+\section{Expected value of the minimum}
+
+Let $t$ be the minimum. We are interested in $\E[t]$, for which we
+will need the pdf of $t$. Let $\phi(t)$ represent the cdf of the
+minimum and let $N$ represent the number of samples.
+
+\begin{align*}
+  \phi(t) &= P(min \le t) \\
+          &= 1 - P(min > t) \\
+          &= 1 - P(\forall_ix_i > t) \\
+          &= 1 - \prod_i P(x_i > t) \quad \text{(for independent
+            samples)} \\
+          &= 1 - P(x_1 > t)^N
+\end{align*}
+
+\begin{align*}
+  \od{}{t} \phi(t) &= \od{}{t}(1 - P(x_1>t)^N) \\
+                   &= 0 - NP(x_1>t)^{N-1} \cdot \od{}{t} P(X_1>t) \\
+                   &= -N \cdot P(x_1>t)^{N-1} \cdot \od{}{t}(1-P(x \le t)) \\
+                   &= -N \cdot P(x_1 > t)^{N-1} \cdot (0 - p(t)) \\
+                   &= N \cdot P(x_1 > t)^{N-1} p(t) \\
+                   &= N \left(1 - P(X_1 < t) \right)^{N-1} \cdot p(t) \\
+                   &= N \cdot p(t) \left( 1 - P(t)\right)^{N-1}
+\end{align*}
+
+
+\[ \E[t] = \int_0^1 N \cdot p(t) (1-P(t))^{n-1} \cdot t \; dt \\ \]
+
+We have $N = 2$. $U(0,1)$ so
+
+\[
+
+\left\{
+  \begin{array}{ll}
+    1 & 0 \le x \le 1 \\
+    0 & \text{else}
+  \end{array}
+\right.
+\]
 
 \end{document}
