@@ -1,0 +1,126 @@
+\documentclass{article}
+\usepackage{amsmath,amsthm}
+\usepackage{cancel}
+\usepackage{indentfirst}
+\usepackage{commath}
+\begin{document}
+
+% TODO: Pull this into a common file
+% From Wikipedia, not sure where to define this yet...
+\def\ci{\perp\!\!\!\perp}
+\def\defeq{\buildrel\triangle\over =}
+\def\E{\mathrm{E}}
+\def\Var{\mathrm{Var}}
+\def\Cov{\mathrm{Cov}}
+
+
+\section{MLE for the Bernoulli/ binomial model}
+
+\begin{gather}
+X_i \sim Ber(\theta) \\
+p(D|\theta) = \theta^{N_1}(1 - \theta)^{N_0}
+\end{gather}
+
+\begin{align*}
+  \ln \left(  p(D|\theta) \right) &= \ln \left( \theta^{N_1}(1 -
+                                    \theta)^{N_0} \right) \\
+                                  &= \ln \left( \theta^{N-1} \right) + \ln \left( 1 - \theta
+                                    \right)^{N_0} \\
+                                  &= N_1 \ln \theta + N_0 \ln (1 - \theta) \\
+  \od{}{\theta} \ln p(D|\theta) &= \frac{N_1}{\theta} - \frac{N_0}{1 -
+                                  \theta}
+\end{align*}
+
+The log-likelihood will take a maximum when the derivative equals 0.
+
+\begin{align*}
+  0 &= \frac{N_1}{\theta} - \frac{N - N_1}{1 - \theta} \\
+  0 &= N_1(1 - \theta) - \theta(N-N_1) \\
+  0 &= N_1 - \theta N_1 - \theta N + \theta N_1 \\
+  0 &= N_1 - \theta(N_1 + N - N_1) \\
+  0 &= N_1 - \theta N \\
+  \hat{\theta} &= \frac{N_1}{N}
+\end{align*}
+\section{Marginal likelihood for Beta-Bernoulli model}
+\begin{equation}\label{chain-rule-prob}
+  p(X_{1:N}) = p(x_1)p(x_2|x_1)p(x_3|x_{1:2}) ... p(x_N|x_{N-1})
+\end{equation}
+
+\begin{equation}\label{bb-post-pred}
+    p(X=k|D_{1:N}) = \frac{N_k + \alpha_k}{\sum_i N_i + \alpha_i}
+\end{equation}
+
+\begin{equation}\label{gamma-def}
+  (\alpha - 1)! = \Gamma(\alpha)
+\end{equation}
+
+Given $D = H,T,T,H,H \defeq 1,0,0,1,1$
+
+\begin{gather*}
+  p(X=1|\alpha) = \frac{\alpha_1}{\alpha} \\
+  p(X=0|\alpha, D_1) = \frac{\alpha_0}{\alpha + 1} \\
+  p(X=0|\alpha, D_{1:2}) = \frac{\alpha_0 + 1}{\alpha + 2} \\
+  p(X=1|\alpha, D_{1:3}) = \frac{\alpha_0 + 1}{\alpha + 3} \\
+  p(X=1|\alpha, D_{1:4}) = \frac{\alpha_0 + 2}{\alpha + 4} \\
+\end{gather*}
+
+\begin{align*}
+  p(D) &= p(D_{1:5}) \\
+       &= p(D_1) \cdot p(D_2|D_1) \cdot p(D_3|D_{1:2}) \cdot
+         p(D_4|D_{1:3}) \cdot p(D_5|D_{1:4}) \qquad \text{by ($\ref{chain-rule-prob}$)} \\
+       &= \frac{\alpha_1}{\alpha} \cdot
+         \frac{\alpha_0}{\alpha + 1} \cdot \frac{\alpha_0 + 1}{\alpha + 2}
+         \cdot \frac{\alpha_1 + 1}{\alpha + 3} \cdot \frac{\alpha_1 +
+         2}{\alpha + 4} \qquad \text{by ($\ref{bb-post-pred}$)} \\
+       &= \frac{\left[ \alpha_1 (\alpha_1 + 1) (\alpha_1 + 2) \right] \left[
+         \alpha_0 (\alpha_0 + 1) \right]}
+         {\alpha (\alpha + 1) (\alpha + 2) (\alpha + 3) (\alpha + 4) }
+  \\
+       &= \frac{\left[ (\alpha_1) ... (\alpha_1 + N_1 - 1) \right] \left[
+         (\alpha_0) ... (\alpha_0 + N_0 - 1) \right]}
+         {(\alpha) ... (\alpha + N - 1)} \\
+       &= \frac{(\alpha_1 + N_1 - 1)!}{(\alpha_1 - 1)!} \cdot
+         \frac{(\alpha_0 + N_0 - 1)!}{(\alpha_0 - 1)!} \cdot
+         \frac{(\alpha - 1)!}{(\alpha + N - 1)!} \\
+       &= \frac{\Gamma(\alpha_1 + N_1)}{\Gamma(\alpha_1)} \cdot \frac{\Gamma(\alpha_0
+         + N_0)}{\Gamma(\alpha_0)} \cdot
+         \frac{\Gamma(\alpha)}{\Gamma(\alpha + N)} \\
+       &= \frac{\Gamma(\alpha_1 + N_1) \; \Gamma(\alpha_0 +
+         N_0)}{\Gamma(\alpha_1) \Gamma(\alpha_0)}
+         \frac{\Gamma(\alpha_0 + \alpha_1)}{\Gamma(\alpha_0 + \alpha_1 +
+         N)}
+\end{align*}
+
+\section{Posterior predictive for a Beta-Binomial model}
+
+\begin{align*}
+  p(x|n,D) &= Bb(x|\alpha_0', \alpha_1', n) \\
+  &= \frac{B(x + \alpha_1', n-x+\alpha_0')}{B(\alpha_1',\alpha_0')} {n
+    \choose x}
+\end{align*}
+
+Given $n = 1$
+
+\begin{align*}
+  Bb(1|\alpha_0,\alpha_1,1) &= \frac{B(1 + \alpha_1,
+                              \alpha_0)}{B(\alpha_1, \alpha_0)} {1
+                              \choose 1} \\
+                            &= \frac{\Gamma(1 + \alpha_1)
+                              \Gamma(\alpha_0)}{\Gamma(\alpha_0 +
+                              \alpha_1 + 1)} \cdot
+                              \frac{\Gamma(\alpha_0 +
+                              \alpha_1)}{\Gamma(\alpha_0)\Gamma(\alpha_1)}
+  \\
+                            &= \frac{\alpha_1 \Gamma(\alpha_1)
+                              \Gamma(\alpha_0)}{(\alpha_0 + \alpha_1)
+                              \Gamma(\alpha_0 + \alpha_1)} \cdot
+                              \frac{\Gamma(\alpha_0 +
+                              \alpha_1)}{\Gamma(\alpha_0)\Gamma(\alpha_1)}
+  \\
+                            &= \frac{\alpha_1}{\alpha_0 + \alpha_1} \\
+                            &= \frac{\alpha_1}{\alpha}
+\end{align*}
+
+
+
+\end{document}
