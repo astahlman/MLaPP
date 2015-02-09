@@ -3,6 +3,7 @@
 \usepackage{cancel}
 \usepackage{indentfirst}
 \usepackage{commath}
+\usepackage{pgfplots}
 \begin{document}
 
 % TODO: Pull this into a common file
@@ -157,5 +158,134 @@ We recognize the final integral as the normalization constant for a
 $Beta(\theta|0,0)$ distribution.
 
 \section{MLE for the Poisson distribution}
+\begin{gather*}
+  P(X=k|\lambda) = e^{-\lambda}\frac{\lambda^{k}}{k!} \quad \text{for
+  } k \in \left\{ 0,1,2... \right\} \\
+\end{gather*}
 
+\begin{align*}
+  p(x|\lambda) &= e^{-\lambda} \cdot \frac{\lambda^{x_1}}{x_1!} \cdot
+  e^{-\lambda} \cdot \frac{\lambda^{x_2}}{x_2!} \cdot ... \\
+               &= \prod_{i=1}^N e^{-lambda} \cdot
+                 \frac{lambda^{x_i}}{x_i!} \\
+\end{align*}
+
+Now we take the log-likelihood and find its maximum.
+
+\begin{align*}
+  \ell(\lambda) &= \ln p(x|lambda) \\
+                &= \ln \left( \prod_{i=1}^N \frac{e^{-\lambda}\lambda^{x_i}}{x_i!}
+                  \right) \\
+                &= \ln \left( \frac{e^{-\lambda}\lambda^{x_1}}{x_1!} \cdot
+                  \frac{e^{-\lambda}\lambda^{x_2}}{x_2!} \right) ... \\
+                &= \sum_{i=1}^N \ln \left(
+                  \frac{e^{-\lambda}\lambda^{x_i}}{x_i!} \right) \\
+                &= \sum_{i=1}^N \ln (e^{-\lambda} \lambda^{x_i}) - \ln(x_i!) \\
+                &= \sum_{i=1}^N \ln (e^{-\lambda}) + \ln (\lambda^{x_i}) - \ln
+                  (x_i!) \\
+                &= \sum_{i=1}^N -\lambda + x_i \ln \lambda - \ln
+                  \left( x_i! \right) \\
+                &= -N\lambda + \left( \ln \lambda \right) \sum_{i=1}^N {x_i} -
+                  \sum_{i=1}^N \ln \left( x_i! \right) \\
+\end{align*}
+\begin{align*}
+  \ell'(\lambda) &= \frac{1}{\lambda} \sum_{i=1}^N {x_i} - N = 0 \\
+  \frac{\sum_{i=1}^N {x_i}}{\lambda} &= N \\
+  \lambda_{MLE} &= \frac{\sum_{i=1}^N x_i}{N}
+\end{align*}
+
+\section{Bayesian analysis of the Poisson distribution}
+\subsection{a.}
+
+\begin{align*}
+  p(\lambda|D) &= \frac{p(D|\lambda)p(\lambda)}{p(D)} \\
+               &\propto p(D|\lambda)p(\lambda) \\
+               &= \frac{e^{-N\lambda} \cdot \lambda^{\sum_{i=1}^N
+                 x_i}}{\prod_{i=1}^N x_i!} \cdot \frac{\lambda^{a-1}
+                 e^{-\lambda b}}{k} \\
+               &\propto e^{-N\lambda - \lambda b} \cdot
+                 \lambda^{a - 1 + \sum_{i=1}^N x_i} \\
+               &= e^{-\lambda (N + b)} \cdot \lambda^{ \left[ a +
+                 \sum_{i=1}^N x_i \right] - 1} \\
+               &= Ga(\lambda | a + \sum_{i=1}^N x_i, N + b)
+\end{align*}
+\subsection{b.}
+
+\begin{gather*}
+  \frac{a + \sum_{i=1}^N x_i}{N + b} as a \to 0, b \to 0 \\
+  = \frac{\sum_{i=1}^N x_i}{N} \\
+  = \lambda_{MLE}
+\end{gather*}
+
+\section{MLE for the uniform distribution}
+
+\subsection{a.}
+
+\begin{align*}
+  p(D|a) &= \prod_{i=1}^N p(x) \\
+         &= \left( \frac{1}{2a} \right)^N I(x_1,x_2,...,x_N \in [-a,a]) \\
+         &= \left\{ \begin{array}{ll}
+                     \left( \frac{1}{2a} \right)^N & \mbox{if $-a \le x_i \le a, \forall i$} \\
+                     0 & \mbox{otherwise} \end{array} \right. \\
+\end{align*}
+
+Now we take the derivative of the log-likelihood.
+
+\begin{align*}
+  \ell(a) &= \ln \left( \frac{1}{2a} \right)^N \\
+          &= \ln 1 - \ln (2a)^N \\
+          &= -N \ln (2a) \\
+  \ell'(a) &= -N \frac{1}{2a} \cdot 2 \\
+          &= -\frac{N}{a}
+\end{align*}
+
+
+\begin{figure}[h]
+  \begin{tikzpicture}
+    \begin{axis}[
+      samples=100,
+      domain=-5:5,
+      axis x line=middle,
+      axis y line=middle,
+      restrict y to domain=-3:3,
+      xlabel=$a$,
+      ylabel=$\ell'(a)$,
+      xticklabels={,,},
+      yticklabels={,,}]
+      \addplot[
+      very thick,
+      dashed,
+      domain=-1:1
+      ] plot(\x, {-1/\x});
+      \addplot[
+      very thick,
+      domain=-5:-1
+      ] plot(\x, {-1/\x});
+      \addplot[
+      very thick,
+      domain=1:5
+      ] plot(\x, {-1/\x});
+      \addplot[
+      very thick,
+      dashed
+      ] plot(-1, \x);
+      \addplot[
+      very thick,
+      dashed
+      ] plot(1, \x);
+      \node[label={180:{$x_{(1)}$}}, circle, fill, inner sep=2pt] at
+      (axis cs:-1,1) {};
+      \node[label={180:{$x_{(N)}$}}, circle, fill, inner sep=2pt] at
+      (axis cs:1,-1) {};
+    \end{axis}
+  \end{tikzpicture}
+\end{figure}
+
+For $a < 0$, the likelihood is increasing, so it will be maximized
+where $a = x_{(1)}$, assuming that $|x_{(1)}| \ge |x_{(N)}|$.
+Similarly, for $a > 0$, the likelihood is decreasing, so it is
+maximized where $a = x_{(n)}$, assuming that
+$|x_{(N)}| \ge |x_{(1)}|$. This function is only defined when
+$\max_i |x_i| \le a$. This means that $\ell$ is maximized at
+$a = \max( |x_{(1)}|, |x_{(n)}| )$.
 \end{document}
