@@ -4,6 +4,7 @@
 \usepackage{indentfirst}
 \usepackage{commath}
 \usepackage{pgfplots}
+\usepackage{bbold}
 \begin{document}
 
 % TODO: Pull this into a common file
@@ -13,6 +14,7 @@
 \def\E{\mathrm{E}}
 \def\Var{\mathrm{Var}}
 \def\Cov{\mathrm{Cov}}
+\newcommand\numberthis{\stepcounter{equation}\tag{\theequation}}
 
 
 \section{MLE for the Bernoulli/ binomial model}
@@ -42,7 +44,7 @@ The log-likelihood will take a maximum when the derivative equals 0.
   0 &= N_1 - \theta N \\
   \hat{\theta} &= \frac{N_1}{N}
 \end{align*}
-\section{Marginal likelihood for Beta-Bernoulli model}
+\section{Marginal likelihood for Beta-Bernoulli model}\label{3.2}
 \begin{equation}\label{chain-rule-prob}
   p(X_{1:N}) = p(x_1)p(x_2|x_1)p(x_3|x_{1:2}) ... p(x_N|x_{N-1})
 \end{equation}
@@ -288,4 +290,276 @@ maximized where $a = x_{(n)}$, assuming that
 $|x_{(N)}| \ge |x_{(1)}|$. This function is only defined when
 $\max_i |x_i| \le a$. This means that $\ell$ is maximized at
 $a = \max( |x_{(1)}|, |x_{(n)}| )$.
+
+\subsection{b.}
+$p(x_{n+1}) = \frac{1}{b-a} = \frac{1}{2a}$
+
+\subsection{c.}
+Our approach is not Bayesian, so we will assign zero probability to
+$x_{n+1} > a$ and $x_{n+1} < -a$. A better solution would be to derive
+$\hat{a}_{MAP}$ and give a plug-in approximation.
+
+\section{Bayesian analysis of the uniform distribution}
+
+We must derive the posterior, $p(D|\theta)$ given the following:
+
+\begin{equation}
+  p(D,\theta) = \frac{Kb^K}{\theta^{N+K+1}} \mathbb{I}(\theta \ge
+  \max(D,b)) \\
+\end{equation}
+
+Let $m = \max(D)$.
+
+\begin{align*}
+  p(D) &= \int_m^\infty \frac{Kb^K}{\theta^{N+K+1}} \; d\theta \\
+       &= \left\{ \begin{array}{ll}
+                    \frac{K}{(N+K)b^N} & \mbox{if $m \le b$} \\
+                    \frac{Kb^K}{(N+K)m^{N+K}} & \mbox{if $m >
+                                                b$} \end{array}
+                                                \right. \numberthis \\
+\end{align*}
+
+\begin{align*}
+  p(\theta|D) &= \frac{p(\theta,D)}{p(D)} \\
+              &= \left\{ \begin{array}{ll}
+                           \frac{Kb^K}{\theta^{N+K+1}} \cdot
+                           \frac{(N+K)b^N}{K} & \mbox {if $m \le b \le
+                           \theta$} \\
+                           \frac{Kb^K}{\theta^{N+K+1}} \cdot
+                           \frac{(N+K)m^{N+K}}{Kb^K} & \mbox {if $b < m
+                           \le \theta$} \end{array} \right. \\
+              &= \left\{ \begin{array}{ll}
+                           (N+K) \cdot b^{N+K} \cdot \theta^{-(N+K+1)} & \mbox {if $m \le b \le
+                           \theta$} \\
+                           (N+K) \cdot m^{N+K} \cdot \theta^{-(N+K+1)} & \mbox {if $b < m
+                           \le \theta$} \end{array} \right. \\
+              &\propto \left\{ \begin{array}{ll}
+                           \text{Pareto}(\theta|N+K,b)& \mbox {if $m \le b \le
+                           \theta$} \\
+                           \text{Pareto}(\theta|N+K,m)& \mbox {if $b < m
+                           \le \theta$} \end{array} \right. \\
+              &= \text{Pareto}(\theta|N+K, \max(m,b))
+\end{align*}
+
+\section{Taxicab (tramcar) problem}
+
+\begin{equation}
+  \text{Pareto}(\theta|N+K, \max(m,b))  
+\end{equation}
+
+\subsection{a.}
+Given a non-informative prior, $ \text{Pareto}(\theta|0,0)$:
+
+\begin{align*}
+  p(\theta|D) &= \text{Pareto}(\theta|1 + 0, \max(100, 0)) \\
+              &= \text{Pareto}(\theta|1, 100)
+\end{align*}
+
+\subsection{b.}
+
+$ E[\theta|D] = \frac{km}{k - 1} \text{ and } k = 1$, so the posterior
+mean is not defined.
+
+The mode is $\max(D) = 100$.
+
+\begin{align*}
+  \int_{100}^x km^k \theta^{-(k+1)} \; d\theta &= \frac{1}{2} \\
+  100 \int_{100}^x \theta^{-2} \; d\theta &= \frac{1}{2} \\
+  \left[ - \frac{1}{\theta} \right]_{100}^x &= \frac{1}{200} \\
+  -  \frac{1}{x} + \frac{1}{100} &= \frac{1}{200} \\
+  x &= 200
+\end{align*}
+
+The median is 200.
+
+\subsection{c.}
+
+\begin{align*}
+  p(D'|D,\alpha) &= \int_\theta p(D'|\theta) p(\theta|D,\alpha) \;
+                   d\theta) \\
+                 &= \int_\theta \frac{1}{\theta} \mathbb{I}(x \le
+                   \theta) \cdot N \cdot m^N \cdot \theta^{-(N+1)} \;
+                   d\theta \\
+                 &= Nm^N \int_\theta \theta^{-(N+2)} \; d\theta \\
+                 &= Nm^N \left[ -\frac{1}{N-1} \theta^{-N-1}
+                   \right]_{\max(x,m)}^\infty \\
+                 &= Nm^N \left[ 0 - \left( -\frac{1}{N-1}
+                   \max(x,m)^{-N-1} \right) \right] \\
+                 &= \frac{Nm^N}{(N+1)\max(x,m)^{N+1}} \\
+                 &= \left\{ \begin{array}{ll}
+                              \frac{N}{m(N+1)} & \mbox{if $x < m$} \\
+                              \frac{Nm^N}{x^{N+1}(N+1)} & \mbox{if $x
+                                                          \ge m$}
+                            \end{array} \right.
+\end{align*}
+
+\subsection{d.}
+
+\begin{equation*}
+  \begin{split}
+    p(x = 100|D,\alpha) &= \frac{1 \cdot 100^1}{(1+1)100^{1+1}} =
+    \frac{1}{200} \\
+    p(x = 50|D,\alpha) &= \frac{1}{(1+1)100} = \frac{1}{200} \\
+    p(x = 150|D,\alpha) &= \frac{1 \cdot 100^1}{(1+1)150^{1+1}} =
+    \frac{1}{450}
+  \end{split}
+\end{equation*}
+
+\subsection{e.}
+To improve the accuracy we could use a more informative prior. For
+example, we could estimate the number of cabs based on the city's
+population. Accuracy will also improve with more observations.
+
+\section{Bayesian analysis of the exponential distribution}
+
+\subsection{a.}
+
+\begin{gather*}
+  p(x|\theta) = \theta e^{-\theta x} \quad \text{for } x \ge 0, \theta
+  \ge 0 \\
+  p(D|\theta) = \prod_{i=1}^N p(x_i|\theta) = \prod_{i=1}^N \theta
+  e^{-\theta x_i}
+\end{gather*}
+
+\begin{align*}
+  \ln (p(D|\theta)) &= \sum_{i=1}^N \ln \theta e^{-\theta x_i} \\
+                    &= \sum_{i=1}^N \ln \theta + \ln e^{-\theta x_i}
+  \\
+                    &= \sum_{i=1}^N \ln \theta + -\theta x_i \\
+  \frac{d}{d\theta} (\sum_{i=1}^N \ln \theta + -\theta x_i) &=
+                                                              \sum_{i=1}^N
+                                                              \frac{1}{\theta}
+                                                              - x_i \\
+  0 &= \frac{N}{\theta} - \sum_{i=1}^N x_i \\
+  \hat{\theta} &= \frac{N}{\sum_{i=1}^N x_i} \\
+  \hat{\theta} &= \frac{1}{\frac{1}{N} \sum_{i=1}^N x_i}
+\end{align*}
+
+\subsection{b.}
+\begin{align*}
+  \hat{\theta} &= \frac{1}{\frac{1}{N} \sum_{i=1}^N x_i} \\
+               &= \frac{1}{\frac{1}{3}(5+6+4)} \\
+               &= \frac{1}{5}
+\end{align*}
+
+\subsection{c.}
+
+\begin{align*}
+  p(\theta) &= \text{Expon}(\theta|\lambda) \\
+            &= \lambda e^{-\lambda \theta} \\
+            &= \frac{\lambda^1}{\Gamma(1)} \theta^{1-1} e^{-\lambda \theta} \\
+            &= \text{Ga}(\theta|1, \lambda)
+\end{align*}
+
+The mean of the Gamma distribution is $\frac{1}{\lambda}$, so
+$\hat{\lambda} = 3$
+
+\subsection{d.}
+
+\begin{equation*}
+  p(\theta|D,\hat{\lambda}) \propto p(D|\theta) p(\theta|\hat{\lambda}) \\
+\end{equation*}
+
+\begin{align*}
+    p(D|\theta) &= \prod_{x=1}^N \theta e^{-\theta x_i} \\
+                &= \theta e^{-\theta x_1} \cdot \theta e^{-\theta x_2}
+                  \cdot \theta e^{-\theta x_3} ... \\
+                &= \theta^N e^{(-\theta x_1 -\theta x_2 -\theta x_3
+                  ...)} \\
+                &= \theta^N e^{-\theta \sum x_i}
+\end{align*}
+
+\begin{equation*}
+  p(\theta|\hat{\lambda}) = \hat{\lambda} e^{-\theta \hat{\lambda}}
+\end{equation*}
+
+\begin{align*}
+  p(\theta|D,\hat{\lambda}) &\propto \theta^N e^{-\theta \sum x_i}
+  \hat{\lambda} e^{-\theta \hat{\lambda}} \\
+  &\propto \theta^N e^{-\theta(\hat{\lambda} + \sum x_i)} \\
+  &= \text{Ga}(\theta|N+1, \hat{\lambda} + \sum_{i=1}^N x_i)
+\end{align*}
+
+\subsection{e.}
+
+Yes, the prior is equivalent to a Gamma distribution and the posterior
+is also a Gamma distribution.
+
+\subsection{f.}
+
+The mean of a Ga$(\theta|a,b)$ distribution is $\frac{a}{b}$. The mean
+of \mbox{Ga$(\theta|N+1, \hat{\lambda} + \sum_{i=1}^N x_i)$} $= \frac{N+1}{ \hat{\lambda} + \sum_{i=1}^N x_i}$
+
+\subsection{g.}
+
+The posterior accounts for the exponential prior. The prior accounts
+for expert knowledge, thus it is more reasonable.
+
+\section{MAP estimate for the Bernoulli with non-conjugate priors}
+
+\subsection{a.}
+
+\begin{align*}
+  p(\theta|D) &\propto p(D|\theta) \cdot p(\theta) \\
+              &\propto \theta^{N_1}(1 - \theta)^{N_0} \cdot
+                \left\{ \begin{array}{ll}
+                          .5 & \mbox{if $\theta = .4 \text{ or } .5$} \\
+                          0 & \mbox{else} \end{array} \right. \\
+              &\propto \left\{ \begin{array}{ll}
+                                 \theta^{N_1}(1 - \theta)^{N - N_1} &
+                                                                      \mbox{if
+                                                                      $\theta
+                                                                      \in
+                                                                      \{.4,
+                                                                      .5\}$} \\
+                                 0 & \mbox{else} \end{array} \right.
+  \\
+              &= \left\{ \begin{array}{ll}
+                           .4^{N_1}(.6)^{N - N_1} & \mbox{if $\theta = .4$} \\
+                           .5^N & \mbox{if $\theta = .5$} \\
+                           0 & \mbox{else} \end{array} \right.
+  \\
+\end{align*}
+
+\subsection{b.}
+If N is small, $\theta = .4$ will lead to a better estimate since the
+prior is close to the true value. As N grows, the data will overwhelm
+the prior.
+
+\section{Posterior predictive distribution for a batch of data with
+the Dirichlet-multinomial model}
+
+\begin{align*}
+  p(D'|D,\alpha) &= \int_\theta p(D'|\theta) \cdot p(\theta|D) d\theta
+  \\
+                 &= \int_\theta \text{Mu}(N_{new_1}, N_{new_2},...|\theta) \cdot
+                   \text{Dir}(\theta|N_{old_1} + \alpha_1, N_{old_2} + \alpha_2 ...)
+  \\
+                 &= \frac{1}{\text{B}(\alpha + N_{old})} {N_{new}!
+                   \choose N_{new_1}! ... N_{new_k}!} \int_{\theta}
+                   \prod^k \theta_k^{N_{new_k}} \cdot \prod^k
+                   \theta_k^{\alpha_k + N_{old_k}
+                   - 1} \; d\theta \\
+                 &= \frac{1}{\text{B}(\alpha + N_{old})} {N_{new}!
+                   \choose N_{new_1}! ... N_{new_k}!} \int_{\theta} \underbrace{
+                   \prod^k \theta_k^{\alpha_k + N_{new_k} + N_{old_k}
+                   - 1} \; d\theta}_{\text{normalization constant for
+                   Dir($\vec{\alpha} + \vec{N_{new}} +
+                   \vec{N_{old}}$)}} \\
+                 &= {N_{new}! \choose N_{new_1}! ... N_{new_k}!}
+                   \frac{B(\alpha + N_{old} + N_{new})}{B(\alpha +
+                   N_{old})} \\
+                 &= \frac{N'_0!}{\prod N'_k} \cdot \frac{\prod
+                   \Gamma(\alpha_k + N_k + N'_k)}{\Gamma(\alpha_0 + N_0
+                   + N_0')} \cdot \frac{\Gamma(\alpha_0 + N_0)}{\prod
+                   \Gamma(\alpha_k + N_k)} \quad \text{where
+                   $\alpha_0 = \sum_{i=1}^k \alpha_i, N = \sum_{i=1}^k
+                   N_i, \text{ and } N' = \sum_{i=1}^k N'_i$} \\
+                 &= \frac{N'_0!}{\prod N'_k} \cdot \frac{\Gamma(\alpha_0 +
+                   N_0)}{\Gamma(\alpha_0 + N_0 + N'_0)} \cdot
+                   \frac{\prod \Gamma(\alpha_k + N_k + N'_k)}{\prod
+                   \Gamma(\alpha_k + N_k)}
+\end{align*}
+
+Notice that this looks like the formula we derived in exercise \ref{3.2}.
 \end{document}
