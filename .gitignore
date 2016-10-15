@@ -4,3 +4,4 @@
 *.log
 *.aux
 *.dvi
+.Rhistory

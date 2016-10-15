@@ -528,6 +528,7 @@ the prior.
 
 \section{Posterior predictive distribution for a batch of data with
 the Dirichlet-multinomial model}
+\label{3.13}
 
 \begin{align*}
   p(D'|D,\alpha) &= \int_\theta p(D'|\theta) \cdot p(\theta|D) d\theta
@@ -549,17 +550,80 @@ the Dirichlet-multinomial model}
                  &= {N_{new}! \choose N_{new_1}! ... N_{new_k}!}
                    \frac{B(\alpha + N_{old} + N_{new})}{B(\alpha +
                    N_{old})} \\
-                 &= \frac{N'_0!}{\prod N'_k} \cdot \frac{\prod
+                 &= \frac{N'_0!}{\prod N'_k!} \cdot \frac{\prod
                    \Gamma(\alpha_k + N_k + N'_k)}{\Gamma(\alpha_0 + N_0
                    + N_0')} \cdot \frac{\Gamma(\alpha_0 + N_0)}{\prod
                    \Gamma(\alpha_k + N_k)} \quad \text{where
-                   $\alpha_0 = \sum_{i=1}^k \alpha_i, N = \sum_{i=1}^k
-                   N_i, \text{ and } N' = \sum_{i=1}^k N'_i$} \\
-                 &= \frac{N'_0!}{\prod N'_k} \cdot \frac{\Gamma(\alpha_0 +
+                   $\alpha_0 = \sum_{i=1}^k \alpha_i, N_0 = \sum_{i=1}^k
+                   N_i, \text{ and } N'_0 = \sum_{i=1}^k N'_i$} \\
+                 &= \frac{N'_0!}{\prod N'_k!} \cdot \frac{\Gamma(\alpha_0 +
                    N_0)}{\Gamma(\alpha_0 + N_0 + N'_0)} \cdot
                    \frac{\prod \Gamma(\alpha_k + N_k + N'_k)}{\prod
                    \Gamma(\alpha_k + N_k)}
 \end{align*}
 
-Notice that this looks like the formula we derived in exercise \ref{3.2}.
+Notice that this looks like the formula we derived in exercise
+\ref{3.2}.
+
+\section{Posterior predictive for Dirichlet-multinomial}
+
+\subsection{a.}
+
+\begin{align*}
+  p(X=j|D) &= E[\theta_j|D] \qquad \text{Equation (3.51) in the
+  textbook} \\
+           &= \frac{\alpha_j + N_j}{\alpha_0 + N} \\
+           &= \frac{10 + 260}{(10 \cdot 27) + 2000} \\
+           &= .119
+\end{align*}
+
+\subsection{b.}
+
+We use the equation from \ref{3.13}.
+
+\begin{equation*}
+  p(D'|D,\alpha) = \frac{N'_0!}{\prod N'_k!} \cdot \frac{\Gamma(\alpha_0 +
+                   N_0)}{\Gamma(\alpha_0 + N_0 + N'_0)} \cdot
+                   \frac{\prod \Gamma(\alpha_k + N_k + N'_k)}{\prod
+                   \Gamma(\alpha_k + N_k)}
+\end{equation*}
+
+For a single trial, $ N'_0 = N'_j= 1$, so the first term is equal to
+1. Now we examine the last term.
+
+\begin{align*}
+  p(x=j|D,\alpha) &= \frac{\Gamma(\alpha_0 + N_0)}{\Gamma(\alpha_0 + N_0 + N'_0)}
+             \cdot \frac{\prod_{k \neq j} \Gamma(\alpha_k + N_k +
+             N'_k)}{\prod_{k \neq j} \Gamma(\alpha_k + N_k)} \cdot
+             \frac{\Gamma(\alpha_j + N_j + N'_j)}{\Gamma(\alpha_j +
+             N_j)} \\
+           &= \frac{\Gamma(\alpha_0 + N_0)}{\Gamma(\alpha_0 + N_0 + N'_0)}
+             \cdot \prod_{k \neq j} \frac{\Gamma(\alpha_k + N_k +
+             0)}{\Gamma(\alpha_k + N_k)} \cdot \frac{\Gamma(\alpha_j +
+             N_j + N'_j)}{\Gamma(\alpha_j + N_j)} \\
+           &= \frac{\Gamma(\alpha_0 + N_0)}{\Gamma(\alpha_0 + N_0 + N'_0)}
+             \cdot 1 \cdot \frac{\Gamma(\alpha_j +
+             N_j + N'_j)}{\Gamma(\alpha_j + N_j)} \\
+           &= \frac{\Gamma(\alpha_0 + N_0)}{\Gamma(\alpha_0 + N_0 + 1)}
+             \cdot \frac{\Gamma(\alpha_j +
+             N_j + 1)}{\Gamma(\alpha_j + N_j)} \\
+           &= \frac{\Gamma(\alpha_0 + N_0)}{(\alpha_0 +
+             N_0)\Gamma(\alpha_0 + N_0)} \cdot \frac{(\alpha_j +
+             N_j)\Gamma(\alpha_j + N_j)}{\Gamma(\alpha_j + N_j)} \\
+           &= \frac{\alpha_j + N_j}{\alpha_0 + N_0}
+\end{align*}
+
+For independent samples
+
+\begin{align*}
+  p(x_{2001}=a, x_{2002}=p|D,\alpha) &= p(x_{2001}=a|D,\alpha)
+                                           \cdot
+                                           p(x_{2002}=p|D',\alpha)
+  \\
+                                         &= \frac{10 + 100}{270 +
+                                           2000} \cdot \frac{10 +
+                                           87}{270 + 2001} \\
+                                         &= .0021
+\end{align*}
+
 \end{document}
