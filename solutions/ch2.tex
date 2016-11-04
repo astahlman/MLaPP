@@ -544,65 +544,57 @@ We can ignore the denominator.
 
 \section{Expected value of the minimum}
 
-Let $t = min(X_1,X_2,...,X_N)$. We are interested in $\E[t]$, for which we
+Let $T = min(X_1,X_2,...,X_N)$. We are interested in $\E[T]$, for which we
 will need the pdf of $t$. Let $N$ represent the number of samples.
 
 \begin{align*}
-  F(t) &= P(min \le t) \\
-          &= 1 - P(min > t) \\
-          &= 1 - P(\forall_iX_i > t) \\
-          &= 1 - \prod_i P(X_i > t) \quad \text{(for independent
-            samples)} \\
-          &= 1 - P(X_1 > t)^N
+F(t) &= P(T \le t) \\
+     &= \begin{cases}
+       0 & \quad \text{if } t < a \\
+       1 - P(T > t), & \quad \text{for } a \le t \le b \\
+       1 & \quad \text{if } t > b \\
+     \end{cases} \\
+     &= 1 - P(\forall_iX_i > t) \quad \text{for } a \le t \le b\\
+     &= 1 - \prod_i P(X_i > t) \quad \text{for } a \le t \le b
+       \quad \text{(because samples are indpendent)}\\
+     &= 1 - P(X_1 > t)^N \quad \text{for } a \le t \le b\\
+     &= 1 - \left( \frac{b - t}{b - a} \right)^N \quad \text{for } a
+       \le t \le b
 \end{align*}
 
+Now we take the derivative, $f(t)$, which is the pdf.
 \begin{align*}
   f(t) &= \od{}{t} F(t) \\
-       &= \od{}{t}(1 - P(X_1>t)^N) \\
-       &= 0 - NP(X_1>t)^{N-1} \cdot \od{}{t} P(X_1>t) \\
-       &= -N \cdot P(X_1>t)^{N-1} \cdot \od{}{t}(1-P(X_1 \le t)) \\
-       &= -N \cdot P(X_1 > t)^{N-1} \cdot (0 - f(x)) \\
-       &= N \cdot P(X_1 > t)^{N-1} f(x) \\
-       &= N \left(1 - P(X_1 \le t) \right)^{N-1} \cdot f(x) \\
-       &= N \cdot f(x) \left( 1 - F(x) \right)^{N-1}
+       &= \od{}{t}\left(1 - \left( \frac{b - t}{b - a} \right)^{N}\right) \\
+       &= 0 - \od{}{t} \left( \frac{1}{(b-a)^N} \cdot (b - t)^N \right)\\
+       &= \frac{N}{(b-a)^N} \cdot (b - t)^{N-1}
 \end{align*}
 
 \begin{align*}
-   \E[t] &= \int_0^1 t \cdot f(t) \; dt \\
-   \E[t] &= N \int_0^1 t \cdot f(x) \left( 1 - F(x) \right)^{N-1}
-           \; dt \\
+   \E[t] &= \int_a^b t \cdot f(t) \; dt \\
+   \E[t] &= \frac{N}{(b-a)^N} \int_a^b (b - t)^{N-1} \cdot t \; dt \\
 \end{align*}
 
-We have $N = 2$. $U(0,1)$ so
-
-\[
-f(x) = 
-\left\{
-  \begin{array}{ll}
-    1 & 0 \le x \le 1 \\
-    0 & \text{else}
-  \end{array}
-\right.
-\]
-
-and
-\[ 
-F(x) =
-\left\{
-  \begin{array}{ll}
-    0 & x < 0 \\
-    t & 0 \le x \le 1 \\
-    1 & x > 1
-  \end{array}
-\right.
-\]
+We can solve this integral using substitution. Let $u = b - t$. Then
+$du = -dt$ and $t = b - u$.
 
 \begin{align*}
-         \E[t] &= 2 \int_0^1 t \cdot 1 \cdot \left( 1 - t \right)^1 \;
-                 dt \\
-               &= 2 \int_0^1 t(1-t) \; dt \\
-               &= 2 \int_0^1{t \; dt} - 2 \int_0^1{t^2 \; dt} \\
-               &= 1 - \frac{2}{3} \\
+  E[t] &= \frac{N}{(b-a)^N} \int_{b-a}^0 (u-b) u^{N-1} \; du \\
+       &= \frac{N}{(b-a)^N} \int_{b-a}^0 u^N - bu^{N-1} \; du\\
+       &= \frac{N}{(b-a)^N} \left[ \left( \frac{u^{N+1}}{N+1} -
+         \frac{bu^N}{N} \right) \right]_{b-a}^0 \\
+       &= \frac{N}{(b-a)^N} \frac{b(b-a)^N(N+1) -
+         N(b-a)^{N+1}}{N(N+1)} \\
+       &= \frac{1}{(b-a)^N} \frac{(b-a)^N \left[ b(N+1) - N(b-a)
+         \right]}{N+1} \\
+       &= \frac{bN + b -bN + Na}{N+1} \\
+       &= \frac{Na + b}{N+1} \\
+\end{align*}
+
+For $N = 2, a = 0, \text{ and } b = 1$.
+
+\begin{align*}
+         \E[t] &= \frac{(2 \cdot 0) + 1}{2 + 1} \\
                &= \frac{1}{3}
 \end{align*}
 
