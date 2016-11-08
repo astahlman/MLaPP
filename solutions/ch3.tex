@@ -499,13 +499,19 @@ for expert knowledge, thus it is more reasonable.
 
 \subsection{a.}
 
+We're looking for the MAP estimate for $\theta$, defined as $\hat{\theta}_{MAP} = \underset{\theta}{\mathrm{argmax}} p(\theta|D)$
+
+We can calculate the posterior up to normalization constants given the
+number of occurrences of heads and tails and the piecewise function
+that defines the prior.
+
 \begin{align*}
   p(\theta|D) &\propto p(D|\theta) \cdot p(\theta) \\
-              &\propto \theta^{N_1}(1 - \theta)^{N_0} \cdot
+              &= \theta^{N_1}(1 - \theta)^{N_0} \cdot
                 \left\{ \begin{array}{ll}
                           .5 & \mbox{if $\theta = .4 \text{ or } .5$} \\
                           0 & \mbox{else} \end{array} \right. \\
-              &\propto \left\{ \begin{array}{ll}
+              &= \left\{ \begin{array}{ll}
                                  \theta^{N_1}(1 - \theta)^{N - N_1} &
                                                                       \mbox{if
                                                                       $\theta
@@ -520,6 +526,13 @@ for expert knowledge, thus it is more reasonable.
                            0 & \mbox{else} \end{array} \right.
   \\
 \end{align*}
+The MAP estimate is the value of $\theta$ that maximizes the equation above.
+
+\begin{equation*}
+  \hat{\theta}_{MAP} = \left\{ \begin{array}{ll}
+                           .4 & \mbox{if $(.4)^{N_1} (.6)^{N-N_1} \ge .5^N$} \\
+                           .5 & \mbox{else} \end{array} \right.
+\end{equation*}
 
 \subsection{b.}
 If N is small, $\theta = .4$ will lead to a better estimate since the
