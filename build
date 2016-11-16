@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+cd solutions
+counter=0
+for src_file in ch*.tex; do
+    echo "Compiling $src_file..."
+    pdflatex $src_file
+    echo "Done compiling $src_file."
+    let counter+=1
+done
+
+echo "Compiled $counter files"

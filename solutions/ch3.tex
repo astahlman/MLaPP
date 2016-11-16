@@ -5,6 +5,9 @@
 \usepackage{commath}
 \usepackage{pgfplots}
 \usepackage{bbold}
+\usepackage{graphicx}
+\graphicspath{ {../figures/} }
+\DeclareGraphicsExtensions{.png}
 \begin{document}
 
 % TODO: Pull this into a common file
@@ -639,4 +642,87 @@ For independent samples
                                          &= .0021
 \end{align*}
 
+\section{Setting the beta hyper-parameters}
+
+First, we express $a$ in terms of $m$ and $b$.
+
+\begin{align*}
+  m &= \frac{a}{a+b} \\
+  a &= m(a + b)  \\
+  a(1 - m) &= mb \\
+  a &= \frac{mb}{1 - m}
+\end{align*}
+
+We can now solve for $b$ in terms of $m$ and $v$ by plugging in this
+value of $a$ into the equation for the variance of a Beta distribution
+with parameters $a$ and $b$.
+
+\begin{align*}
+  \text{var} &= \frac{ab}{(a+b)^2(a+b+1)} \\
+             &= \frac{mb^2}{1-m} \cdot \frac{1}{\left( \frac{mb}{1-m}
+               + b \right)^2 \left ( \frac{mb}{1-m} + b + 1 \right) }
+  \\
+             &= \frac{mb^2}{1} \cdot \frac{(1-m)^2}{\left( mb + b(1-m)
+               \right)^2 (mb + b - mb) + (1 - m)} \\
+  v &= \frac{m(1 - m)^2}{b - m + 1}
+\end{align*}
+
+Now, solving for $b$...
+
+\begin{align*}
+  v(b-m+1) = m(1-m)^2 \\
+  vb - mv + v = m(1-m)^2 \\
+  b = \frac{m}{v}(1-m)^2 + m - 1
+\end{align*}
+
+We can plug $b$ back into our original equation for $a$.
+
+\begin{align*}
+  a &= \frac{mb}{1-m} \\
+    &= \frac{m}{1-m} \cdot \left( \frac{m(1 - m)^2}{b - m + 1} \right)
+  \\
+    &= \frac{m^2(1-m)}{v} + \frac{m^2}{1-m} + \frac{m}{1-m} \\
+    &= \frac{m^2}{v}(1-m) - m
+\end{align*}
+
+Now that we've solved for $b$ and $a$ in terms of $m$ and $v$, all the
+remains is to plug in the values given for $m$ and $v$.
+
+\begin{equation*}
+  a = \frac{(.7)^2}{.2^2}(1 - .7) - .7 = 2.975
+\end{equation*}
+
+\begin{equation*}
+  b = \frac{.7}{.2^2}(1 - .7)^2 + .7 - 1 = 1.275
+\end{equation*}
+
+\section{Setting the beta hyper-parameters II}
+
+We know that the cumulative probability density over the range
+$l \le \theta \le u = .95$. We can express the CDF as a function of
+$a$ given $u$, $l$, and $m$.
+
+\begin{align*}
+  F(a|u,l,m) &= \int_u^l p(\theta) d\theta \\
+             &= \frac{1}{B(a,b)} \int_u^l \theta^{a-1}(1-\theta)^{b-1}
+               d\theta \\
+             &= \frac{1}{B(a,\frac{a(1-m)}{m})} \int_u^l \theta^{a-1}(1-\theta)^{\frac{a(1-m)}{m}-1}
+               d\theta \\
+\end{align*}
+
+Now we want to find the value of $a$ which minimizes the difference
+between this function and the value 0.95. Formally, we want to
+minimize $(F(a|u,l,m) - .95)^2$. We can then easily determine $b$
+given $a$ and $m$ using the formula for the mean of a Beta
+distribution.
+
+The Octave code for this solution is included in the code/ directory
+in this repository. Using this code, we obtain
+$a = 4.605413; b = 26.097340$. This is roughly equivalent to a prior
+sample with 4.6 heads and 26.1 tails, so the equivalent sample size is
+approximately 30.7.
+
+\includegraphics[scale=.5]{fig3_16}
+
 \end{document}
+
