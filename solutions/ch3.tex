@@ -6,6 +6,7 @@
 \usepackage{pgfplots}
 \usepackage{bbold}
 \usepackage{graphicx}
+\usepackage{siunitx}
 \graphicspath{ {../figures/} }
 \DeclareGraphicsExtensions{.png}
 \begin{document}
@@ -723,6 +724,147 @@ sample with 4.6 heads and 26.1 tails, so the equivalent sample size is
 approximately 30.7.
 
 \includegraphics[scale=.5]{fig3_16}
+
+\section{Marginal likelihood for beta-binomial under uniform prior}
+
+To obtain the marginal likelihood, we integrate the joint distribution over $\theta$.
+
+\begin{align*}
+  p(N_1|N) &= \int_\theta p(N_1|N, \theta) \cdot p(\theta|\alpha) \; d\theta \\
+           &= \int_\theta Bin(N_1|N, \theta) \cdot p(\theta|\alpha) \; d\theta \\
+           &= \int_\theta \frac{N!}{(N-N_1)!N_1!} \cdot \theta^{N_1}(1
+             - \theta)^{N - N_1} \cdot \frac{\Gamma(1 +
+             1)}{\Gamma(1)\Gamma(1)} \cdot \theta^{1 - 1} (1 - \theta)^{1 -
+             1} \\
+           &= \frac{N!}{(N-N_1)!N_1!} \int_\theta \theta^{N_1}(1
+             - \theta)^{N - N_1} \cdot \frac{1!}{1 \cdot 1}
+\end{align*}
+
+We recognize the integral as the normalization constant for the Beta
+distribution $\text{Beta}(N_1 + 1, N - N_1 + 1)$.
+
+\begin{align*}
+           p(N_1|N) &= \frac{N!}{(N-N_1)!N_1!} B(N_1 + 1, N - N_1
+                      + 1) \\
+                    &= \frac{N!}{(N-N_1)!N_1!} \frac{\Gamma(N_1 +
+                      1)\Gamma(N-N_1+1)}{\Gamma(N_1+N-N_1+2)} \\
+                    &= \frac{N_1!(N-N_1)!N!}{(N-N_1)!N_1!(N+1)!} \\
+                    &= \frac{N!}{(N+1)!} \\
+                    &= \frac{1}{N+1}
+\end{align*}
+
+\section{Bayes factor for coin tossing}
+
+\begin{align*}
+  BF_{1,0} &= \frac{\text{likelihood}_1}{\text{likelihood}_2} \\
+          &= \frac{p(D|\theta_1)}{p(D|\theta_2)}
+\end{align*}
+
+The likelihood of a fair coin when $N = 10$ and $N_1 = 9$.
+
+\begin{align*}
+  p(D|\theta_1) &= \frac{N!}{(N-N_1)!N_1!} \cdot \theta^{N_1}(1 - \theta)^{N - N_1} \cdot \\
+                &= \frac{10!}{(10-9)!9!} \cdot (.5)^9(.5)^1 \\
+                &= \frac{5}{512} \\
+                &= \num{9.766e-3}
+\end{align*}
+
+When $N = 100$ and $N_1 = 90$
+
+\begin{align*}
+  p(D|\theta_1) &= \frac{N!}{(N-N_1)!N_1!} \cdot \theta^{N_1}(1 - \theta)^{N - N_1} \cdot \\
+                &= \frac{100!}{(100-90)!90!} \cdot (.5)^{90}(.5)^{10} \\
+                &= \num{1.366e-17}
+\end{align*}
+
+A uniform prior signifies that any bias is equally likely. Thus, we
+integrate the likelihood over every possible value of $\theta_2$.
+
+\begin{align*}
+  p(D|\theta_2) &= \int_0^1 p(D|\theta_2) \cdot p(\theta_2) \;
+                  d\theta_2 \\
+                &= \int_0^1 \frac{10!}{(10-9)!9!} \cdot \theta_2^9 (1
+                  - \theta)^1 \frac{1}{1 - 0}\cdot \; d\theta_2 \\
+                &= 10 \int_0^1 \theta_2^9 - \theta_2^{10} \; d\theta_2 \\
+                &= 10 \left[\frac{1}{10} \theta_2^{10} \right]_0^1 -
+                  10 \left[\frac{1}{11} \theta_2^{11} \right]_0^1 \\
+                &= \frac{1}{11}
+\end{align*}
+
+Note that this is again the marginal likelihood, $\frac{1}{N+1}$, which we derived in
+3.17. Thus, for $N = 100$ and $N_1 = 90$, $p(D|\theta_2) =
+\frac{1}{101} = .0099$.
+
+So for 10 trials, $BF_{1,0} = \frac{1}{11} \cdot \frac{512}{5} = 9.31$.
+For 100 trials, $BF_{1,0} = \frac{\frac{1}{101}}{\num{1.366e-17}} = \num{7.25e-14}$.
+
+As we would expect, as the number of trials increases the likelihood
+that the coin is biased drastically increases, as does the Bayes
+Factor.
+
+\section{Irrelevant features with naive Bayes}
+
+\subsection{a.}
+
+\begin{align*}
+  \log_2 p(C|\vec{x_i}) &= \log_2 \left( p(\vec{x_i}|C) p(C) \right) \\
+                        &= \log_2 p(\vec{x_i}|C) + \log_2 p(C) \\
+                        &= \phi(\vec{x_i})^T \beta_c + \log_2 p(C)
+\end{align*}
+
+\begin{align*}
+  \log_2 \frac{p(C=1|\vec{x_i})}{p(C=2|\vec{x_i})} &= \log_2 p(C=1|\vec{x_i}) - \log_2 p(C=2|\vec{x_i}) \\
+      &= \phi(\vec{x_i})^T \beta_1 + log(.5) - (\phi(\vec{x_i})^T \beta_2 + log(.5)) \\
+      &= \phi(\vec{x_i})^T \left[ \beta_1  - \beta_2 \right]
+\end{align*}
+
+\subsection{b.}
+
+The presence or absence of a word will have no effect on the class
+posterior when $\beta_{1,w} - \beta_{2,w} = 0$ (which implies that
+$\theta_{1,w} = \theta_{2,w}$).
+
+\subsection{c.}
+
+No, it will not be ignored.
+
+A word is ignored by our classifier if
+$\theta_{c,w} = k \quad \forall c \in C$ where $k$ is some constant.
+We are told that word $w$ occurs in every document, so it obviously
+occurs in every document in class $c$ for any value of $c$. Therefore,
+$x_{i,w} = 1 \quad \forall i$ and
+
+\begin{equation*}
+  \sum_{i \in c} x_{i,w} = \sum_{i \in c} 1 = n_c
+\end{equation*}
+
+where $n_c$ is the count of documents in class $c$. Plugging into our
+equation for the posterior mean estimate, we get
+
+\begin{equation*}
+  \hat{\theta}_{c,w} = \frac{1 + n_c}{2 + n_c}
+\end{equation*}
+
+Clearly, $\hat{\theta}_{c,w}$ depends on $n_c$. For example, unless
+$n_1 = n_2$, then
+
+\begin{equation*}
+  \frac{1 + n_1}{2 + n_1} \neq \frac{1 + n_2}{2 + n_2}
+\end{equation*}
+
+\subsection{d.}
+
+The simplest way to discard irrelevant terms would be to discard words
+which occur either in every document or in no document. Alternatively,
+we could rank the words according to their mutual information with the
+class label and discard terms with low information.
+
+\section{Class conditional densities for binary data}
+
+\section{Mutual information for naive Bayes classifiers with binary features}
+
+\section{Fitting a naive Bayes spam filter by hand}
+
 
 \end{document}
 
