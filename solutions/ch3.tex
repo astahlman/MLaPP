@@ -18,6 +18,7 @@
 \def\E{\mathrm{E}}
 \def\Var{\mathrm{Var}}
 \def\Cov{\mathrm{Cov}}
+\def\Reals{\rm I\!R}
 \newcommand\numberthis{\stepcounter{equation}\tag{\theequation}}
 
 
@@ -172,14 +173,14 @@ $Beta(\theta|0,0)$ distribution.
 \begin{align*}
   p(x|\lambda) &= e^{-\lambda} \cdot \frac{\lambda^{x_1}}{x_1!} \cdot
   e^{-\lambda} \cdot \frac{\lambda^{x_2}}{x_2!} \cdot ... \\
-               &= \prod_{i=1}^N e^{-lambda} \cdot
-                 \frac{lambda^{x_i}}{x_i!} \\
+               &= \prod_{i=1}^N e^{-\lambda} \cdot
+                 \frac{\lambda^{x_i}}{x_i!} \\
 \end{align*}
 
 Now we take the log-likelihood and find its maximum.
 
 \begin{align*}
-  \ell(\lambda) &= \ln p(x|lambda) \\
+  \ell(\lambda) &= \ln p(x|\lambda) \\
                 &= \ln \left( \prod_{i=1}^N \frac{e^{-\lambda}\lambda^{x_i}}{x_i!}
                   \right) \\
                 &= \ln \left( \frac{e^{-\lambda}\lambda^{x_1}}{x_1!} \cdot
@@ -559,19 +560,23 @@ the Dirichlet-multinomial model}
                    \theta_k^{\alpha_k + N_{old_k}
                    - 1} \; d\theta \\
                  &= \frac{1}{\text{B}(\alpha + N_{old})} {N_{new}!
-                   \choose N_{new_1}! ... N_{new_k}!} \int_{\theta} \underbrace{
+                   \choose N_{new_1}! ... N_{new_k}!} \int_{\theta} 
                    \prod^k \theta_k^{\alpha_k + N_{new_k} + N_{old_k}
-                   - 1} \; d\theta}_{\text{normalization constant for
-                   Dir($\vec{\alpha} + \vec{N_{new}} +
-                   \vec{N_{old}}$)}} \\
+                   - 1} \; d\theta \\
+\end{align*}
+
+Note that the integral is the normalization constant for a Dirichlet
+distribution, Dir($\mathbf{\alpha} + \mathbf{N_{new}} + \mathbf{N_{old}}$).
+
+\begin{align*}
                  &= {N_{new}! \choose N_{new_1}! ... N_{new_k}!}
                    \frac{B(\alpha + N_{old} + N_{new})}{B(\alpha +
                    N_{old})} \\
                  &= \frac{N'_0!}{\prod N'_k!} \cdot \frac{\prod
                    \Gamma(\alpha_k + N_k + N'_k)}{\Gamma(\alpha_0 + N_0
                    + N_0')} \cdot \frac{\Gamma(\alpha_0 + N_0)}{\prod
-                   \Gamma(\alpha_k + N_k)} \quad \text{where
-                   $\alpha_0 = \sum_{i=1}^k \alpha_i, N_0 = \sum_{i=1}^k
+                   \Gamma(\alpha_k + N_k)} \\
+                 &\qquad \text{where $\alpha_0 = \sum_{i=1}^k \alpha_i, N_0 = \sum_{i=1}^k
                    N_i, \text{ and } N'_0 = \sum_{i=1}^k N'_i$} \\
                  &= \frac{N'_0!}{\prod N'_k!} \cdot \frac{\Gamma(\alpha_0 +
                    N_0)}{\Gamma(\alpha_0 + N_0 + N'_0)} \cdot
@@ -807,15 +812,15 @@ Factor.
 \subsection{a.}
 
 \begin{align*}
-  \log_2 p(C|\vec{x_i}) &= \log_2 \left( p(\vec{x_i}|C) p(C) \right) \\
-                        &= \log_2 p(\vec{x_i}|C) + \log_2 p(C) \\
-                        &= \phi(\vec{x_i})^T \beta_c + \log_2 p(C)
+  \log_2 p(C|\mathbf{x_i}) &= \log_2 \left( p(\mathbf{x_i}|C) p(C) \right) \\
+                        &= \log_2 p(\mathbf{x_i}|C) + \log_2 p(C) \\
+                        &= \phi(\mathbf{x_i})^T \beta_c + \log_2 p(C)
 \end{align*}
 
 \begin{align*}
-  \log_2 \frac{p(C=1|\vec{x_i})}{p(C=2|\vec{x_i})} &= \log_2 p(C=1|\vec{x_i}) - \log_2 p(C=2|\vec{x_i}) \\
-      &= \phi(\vec{x_i})^T \beta_1 + log(.5) - (\phi(\vec{x_i})^T \beta_2 + log(.5)) \\
-      &= \phi(\vec{x_i})^T \left[ \beta_1  - \beta_2 \right]
+  \log_2 \frac{p(C=1|\mathbf{x_i})}{p(C=2|\mathbf{x_i})} &= \log_2 p(C=1|\mathbf{x_i}) - \log_2 p(C=2|\mathbf{x_i}) \\
+      &= \phi(\mathbf{x_i})^T \beta_1 + log(.5) - (\phi(\mathbf{x_i})^T \beta_2 + log(.5)) \\
+      &= \phi(\mathbf{x_i})^T \left[ \beta_1  - \beta_2 \right]
 \end{align*}
 
 \subsection{b.}
@@ -861,10 +866,135 @@ class label and discard terms with low information.
 
 \section{Class conditional densities for binary data}
 
+\subsection{a.}
+
+Let us first suppose that $D = 2$. That is $\mathbf{x} \in \Reals^2$.
+We can represent $p(\mathbf{x}|y=c)$ in tabular form.
+
+\begin{tabular}{ |l|l|l| }
+\hline
+        & $x_2=0$              & $x_2=1$             \\ \hline 
+$x_1=0$ & $P(x_1=0, x_2=0)$ & $P(x_1=0, x_2=1)$ \\ \hline 
+$x_1=1$ & $P(x_1=1, x_2=0)$ & $P(x_1=1, x_2=1)$ \\
+\hline
+\end{tabular}
+
+Since we know that the class-conditional marginal probability
+$P(\mathbf{x}|y=c)$ must sum to 1, we can fully express the
+class-conditional probability given any 3 of the parameters above.
+Now, if we were to add a third dimension such that
+$\mathbf{x} \in \Reals^3$, we would double the number of parameters,
+since for each parameter in the 2-dimensional scenario, we would add
+two parameters: one corresponding to $x_3 = 0$ and one corresponding
+to $x_3 = 1$. So for $D = 3$, we have $8 = 2^3$ parameters, and we can
+express $p(\mathbf{x}|y=c)$ in terms of $2^3 - 1$ parameters.
+
+More generally, in a full Bayesian model with $D$ binary features we
+can express the class-conditional distribution $p(\mathbf{x}|y=c)$ in
+terms of $2^D - 1$ parameters.
+
+\subsection{b.}
+
+If the sample size is very small, a full Bayesian model is likely to
+overfit the training data. In this case, the naive model will probably
+give lower test set error.
+
+\subsection{c.}
+
+As the sample size grows, our model will be less prone to overfitting,
+so the full model may give better results if the number of features is
+very small. However, since our feature space grows exponentially with
+D, for large values of D we would need massive amounts of training
+data to ensure that we don't overfit.
+
+\subsection{d.}
+
+\subsubsection{Full}
+
+Since the class prior is uniform, the MAP estimate reduces to the MLE,
+which is just the empirical ratio of the count of occurrences of
+$\mathbf{x}$ for examples in class $c$ to the total number of examples
+in class $c$.
+
+We can fit a model with $N$ training examples, $D$ features, and $C$
+classes as follows. For each class, for each training example in the
+class, for each feature, we calculate the index corresponding to
+$\mathbf{x}$ increment the count in the appropriate class-specific
+frequency table. This procedure requires $O(NDC)$ time.
+
+The space requirements grow exponentially with the number of features,
+since each of the $C$ frequency tables will consist of $2^D$ addresses.
+
+\subsubsection{Naive}
+
+For each of the $D$ features we'll compute a class-conditional MAP
+estimate for feature $j$, $\hat{\theta}_{j,c}$. As with the full
+model, under a uniform prior the MAP is equivalent to the MLE which is
+simply the empirical ratio of the number of examples in class $c$
+where feature $x_j = 1$ to the total number of examples in class $c$.
+
+The time complexity of fitting this model is $O(ND)$. Unlike with the
+full model, whose space requirements are exponential, the space
+requirements for the Naive model are $O(D)$.
+
+\subsection{e.}
+
+\subsubsection{Full}
+
+Using the model for prediction requires that we find
+$\underset{c}{\mathrm{argmax}} p(y=c|\mathbf{x})$. We are told to
+assume that we can convert $\mathbf{x}$ into an array index in $O(D)$
+time, and we will repeat this for each of the $C$ classes, so the time
+complexity is $O(DC)$.
+
+\subsubsection{Naive}
+
+For the Naive model, we need to take the product of $D$ independent
+likelihoods for each of $C$ classes. Thus, the time complexity is
+again $O(DC)$.
+
+\subsection{f.}
+
+\subsubsection{Full}
+
+To account for the $h$ missing features, we have to marginalize over
+them by summing over every possible value of $\mathbf{x}$. If we have
+$h$ missing features, then we have $2^h$ possible values of
+$\mathbf{x}$ in our frequency table over which we must sum. This
+requires $O(C \cdot v \cdot 2^h)$ time.
+
+\subsubsection{Naive}
+
+Marginalizing over the missing $h$ features is much easier in the
+Naive case. We can consider the features independently, so there is no
+combinatorial explosion. We simply sum over all possible values for
+each of the $D$ features. Since the number of possible values is
+constant (2, since the features are binary), this still only requires
+$O(DC)$ time (or, in terms of $h$ and $v$, $O(C \cdot (h + v))$).
+
 \section{Mutual information for naive Bayes classifiers with binary features}
 
+\begin{align*}
+  I(X,Y) &= \sum_{x_j} \sum_y p(x_j, y) \log \frac{p(x_j,
+           y)}{p(x_j)p(y)} \\
+         &= \sum_{x_j \in \{0,1\}} \sum_y p(x_j|y) p(y) \log \frac{p(x_j,
+           y)}{p(x_j)p(y)} \\
+         &= \sum_c p(x_j=1|y=c) p(y=c) \log \frac{p(x_j=1,
+           y=c)}{p(x_j=1)} + p(x_j=0|y=c) p(y=c) \log
+           \frac{p(x_j=0, y=c)}{p(x_j=0)} \\
+         &= \sum_c \left[ \theta_{jc} \pi_c \log
+           \frac{\theta_{jc}}{\theta_j} + (1 - \theta_{jc}) \pi_c \log
+           \frac{1 - \theta_{jc}}{1 - \theta_j} \right] \\
+\end{align*}
 \section{Fitting a naive Bayes spam filter by hand}
 
+\begin{align*}
+  \hat{\theta}_{spam} &= \frac{3}{3 + 4} = \frac{3}{7} \\
+  \hat{\theta}_{secret|spam} &= \frac{2}{3} \\
+  \hat{\theta}_{secret|non-spam} &= \frac{1}{4} \\
+  \hat{\theta}_{sports|non-spam} &= \frac{2}{4} = \frac{1}{2} \\
+  \hat{\theta}_{dollar|non-spam} &= \frac{1}{3} \\
+\end{align*}
 
 \end{document}
 
